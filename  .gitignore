@@ -1,0 +1,33 @@
+## Compilación
+bin/
+obj/
+
+## Archivos de usuario
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Visual Studio
+.vs/
+
+## Archivos temporales
+*.tmp
+*.log
+
+## Publicaciones
+publish/
+*.publish.xml
+
+## Paquetes
+*.nupkg
+packages/
+
+## Archivos de configuración local
+appsettings.*.json
+secrets.json
+
+## Otros
+*.db
+*.sqlite
+*.vscode/
