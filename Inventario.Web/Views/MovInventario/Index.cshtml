@@ -1,7 +1,8 @@
-﻿@model IEnumerable<Inventario.Entities.MovInventario>
+﻿@using System.Linq
+@model IEnumerable<Inventario.Entities.MovInventario>
 
 @{
-    ViewBag.Title = "Listado de Movimientos de Inventario";
+    ViewBag.Title = "Movimientos de Inventario";
 }
 
 <!DOCTYPE html>
@@ -26,9 +27,14 @@
 
         .table-container {
             background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .table {
+            min-width: 1000px;
         }
 
         .btn-custom {
@@ -36,24 +42,54 @@
             padding: 8px 20px;
         }
 
+        .btn-xs {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
         .form-control {
             border-radius: 8px;
         }
 
-        select.form-control {
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .form-select {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='currentColor' class='bi bi-caret-down-fill' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 1rem;
-            padding-right: 2rem;
+            border-radius: 8px;
+            padding-right: 2.5rem;
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+            .form-select:focus {
+                border-color: #86b7fe;
+                outline: 0;
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            }
+
+        .custom-select-wrapper::after {
+            content: '\f078'; /* Font Awesome chevron-down icon */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: #495057;
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            font-size: 0.9rem;
         }
 
         th {
             background-color: #007bff;
             color: white;
+            white-space: nowrap;
         }
 
         .table-hover tbody tr:hover {
@@ -71,7 +107,22 @@
         }
 
         .pagination {
-            margin-top: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .is-invalid {
+            border-color: #dc3545;
+        }
+
+        .invalid-feedback {
+            display: none;
+            color: #dc3545;
+            font-size: 0.875rem;
+        }
+
+        .is-invalid ~ .invalid-feedback {
+            display: block;
         }
     </style>
 </head>
@@ -80,30 +131,32 @@
         <div class="card p-4 mb-4">
             <h2 class="mb-4"><i class="fas fa-warehouse me-2"></i> @ViewBag.Title</h2>
 
-            @using (Html.BeginForm("Index", "MovInventario", FormMethod.Get, new { @class = "row g-3 mb-4" }))
+            @using (Html.BeginForm("Index", "MovInventorsario", FormMethod.Get, new { @class = "row g-3 mb-4" }))
             {
-                <div class="col-md-3">
+                <div class="col-md-3 col-sm-6">
                     <label for="fechaInicio" class="form-label">Fecha Inicio</label>
                     <input type="date" name="fechaInicio" class="form-control" value="@ViewBag.FechaInicio" />
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3 col-sm-6">
                     <label for="fechaFin" class="form-label">Fecha Fin</label>
                     <input type="date" name="fechaFin" class="form-control" value="@ViewBag.FechaFin" />
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3 col-sm-6">
                     <label for="tipoMovimiento" class="form-label">Tipo de Movimiento</label>
-                    <select name="tipoMovimiento" class="form-control" id="tipoMovimiento">
-                        <option value="">Todos</option>
-                        <option value="01" @(ViewBag.TipoMovimiento == "01" ? "selected" : "")>01</option>
-                        <option value="02" @(ViewBag.TipoMovimiento == "02" ? "selected" : "")>02</option>
-                        <option value="03" @(ViewBag.TipoMovimiento == "03" ? "selected" : "")>03</option>
-                    </select>
+                    <div class="custom-select-wrapper">
+                        <select name="tipoMovimiento" class="form-select" id="tipoMovimiento">
+                            <option value="">Todos</option>
+                            <option value="01" @(ViewBag.TipoMovimiento == "01" ? "selected" : "")>01</option>
+                            <option value="02" @(ViewBag.TipoMovimiento == "02" ? "selected" : "")>02</option>
+                            <option value="03" @(ViewBag.TipoMovimiento == "03" ? "selected" : "")>03</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3 col-sm-6">
                     <label for="nroDocumento" class="form-label">Número de Documento</label>
                     <input type="text" name="nroDocumento" class="form-control" value="@ViewBag.NroDocumento" />
                 </div>
-                <div class="col-md-12 mt-3">
+                <div class="col-12 mt-3">
                     <button type="submit" class="btn btn-success btn-custom"><i class="fas fa-search me-2"></i>Buscar</button>
                     <a href="@Url.Action("Index", "MovInventario")" class="btn btn-secondary btn-custom"><i class="fas fa-eraser me-2"></i>Limpiar</a>
                     <a href="#" class="btn btn-primary btn-custom float-end" data-bs-toggle="modal" data-bs-target="#createModal"><i class="fas fa-plus me-2"></i>Crear Nuevo</a>
@@ -153,16 +206,16 @@
                                 <td>@(item.FechaTransaccion.HasValue ? item.FechaTransaccion.Value.ToString("dd/MM/yyyy") : "")</td>
                                 <td>@item.Estado</td>
                                 <td>
-                                    <button class="btn btn-sm btn-warning btn-custom" data-id="@item.IdMovimiento"><i class="fas fa-edit"></i> Editar</button>
-                                    <button class="btn btn-sm btn-danger btn-custom delete-btn" data-id="@item.IdMovimiento"><i class="fas fa-trash"></i> Eliminar</button>
+                                    <button class="btn btn-xs btn-warning btn-custom" data-id="@item.IdMovimiento"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-xs btn-danger btn-custom delete-btn" data-id="@item.IdMovimiento"><i class="fas fa-trash"></i></button>
                                 </td>
                             </tr>
                         }
                     }
                 </tbody>
             </table>
-            <div class="pagination" id="pagination"></div>
         </div>
+        <div class="pagination" id="pagination"></div>
     </div>
 
     <!-- Modal para Crear Nuevo Movimiento -->
@@ -174,45 +227,56 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="createForm">
+                    <form id="createForm" novalidate>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="codCia" class="form-label">Código de Compañía</label>
                                 <input type="text" class="form-control" id="codCia" maxlength="5" required>
+                                <div class="invalid-feedback">El código de compañía es obligatorio y debe tener máximo 5 caracteres.</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="companiaVenta3" class="form-label">Compañía</label>
                                 <input type="text" class="form-control" id="companiaVenta3" maxlength="5" required>
+                                <div class="invalid-feedback">La compañía es obligatoria y debe tener máximo 5 caracteres.</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="almacenVenta" class="form-label">Almacén</label>
                                 <input type="text" class="form-control" id="almacenVenta" maxlength="10" required>
+                                <div class="invalid-feedback">El almacén es obligatorio y debe tener máximo 10 caracteres.</div>
                             </div>
                             <div class="col-md-6">
-                                <label for="tipoMovimiento" class="form-label">Tipo de Movimiento</label>
-                                <select class="form-control" id="tipoMovimientoCreate" required>
-                                    <option value="">Seleccione</option>
-                                    <option value="01">01</option>
-                                    <option value="02">02</option>
-                                    <option value="03">03</option>
-                                </select>
+                                <label for="tipoMovimientoCreate" class="form-label">Tipo de Movimiento</label>
+                                <div class="custom-select-wrapper">
+                                    <select class="form-select" id="tipoMovimientoCreate" required>
+                                        <option value="">Seleccione</option>
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                    </select>
+                                    <div class="invalid-feedback">El tipo de movimiento es obligatorio.</div>
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <label for="tipoDocumento" class="form-label">Tipo de Documento</label>
-                                <select class="form-control" id="tipoDocumento" required>
-                                    <option value="">Seleccione</option>
-                                    <option value="DN">DNI</option>
-                                    <option value="RU">RUC</option>
-                                    <option value="PA">PASAPORTE</option>
-                                </select>
+                                <div class="custom-select-wrapper">
+                                    <select class="form-select" id="tipoDocumento" required>
+                                        <option value="">Seleccione</option>
+                                        <option value="DN">DNI</option>
+                                        <option value="RU">RUC</option>
+                                        <option value="PA">PASAPORTE</option>
+                                    </select>
+                                    <div class="invalid-feedback">El tipo de documento es obligatorio.</div>
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <label for="nroDocumento" class="form-label">Número de Documento</label>
                                 <input type="text" class="form-control" id="nroDocumento" maxlength="50" required>
+                                <div class="invalid-feedback" id="nroDocumentoFeedback"></div>
                             </div>
                             <div class="col-md-6">
                                 <label for="codItem2" class="form-label">Código de Ítem</label>
                                 <input type="text" class="form-control" id="codItem2" maxlength="50" required>
+                                <div class="invalid-feedback">El código de ítem es obligatorio y debe tener máximo 50 caracteres.</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="proveedor" class="form-label">Proveedor</label>
@@ -221,10 +285,12 @@
                             <div class="col-md-6">
                                 <label for="cantidad" class="form-label">Cantidad</label>
                                 <input type="number" class="form-control" id="cantidad" min="1" required>
+                                <div class="invalid-feedback">La cantidad debe ser mayor que cero.</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="fechaTransaccion" class="form-label">Fecha de Transacción</label>
                                 <input type="date" class="form-control" id="fechaTransaccion" required>
+                                <div class="invalid-feedback">La fecha de transacción es obligatoria.</div>
                             </div>
                         </div>
                     </form>
@@ -249,46 +315,57 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editForm">
+                    <form id="editForm" novalidate>
                         <input type="hidden" id="editIdMovimiento" name="IdMovimiento">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="editCodCia" class="form-label">Código de Compañía</label>
                                 <input type="text" class="form-control" id="editCodCia" name="CodCia" maxlength="5" required>
+                                <div class="invalid-feedback">El código de compañía es obligatorio y debe tener máximo 5 caracteres.</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="editCompaniaVenta3" class="form-label">Compañía</label>
                                 <input type="text" class="form-control" id="editCompaniaVenta3" name="CompaniaVenta3" maxlength="5" required>
+                                <div class="invalid-feedback">La compañía es obligatoria y debe tener máximo 5 caracteres.</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="editAlmacenVenta" class="form-label">Almacén</label>
                                 <input type="text" class="form-control" id="editAlmacenVenta" name="AlmacenVenta" maxlength="10" required>
+                                <div class="invalid-feedback">El almacén es obligatorio y debe tener máximo 10 caracteres.</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="editTipoMovimiento" class="form-label">Tipo de Movimiento</label>
-                                <select class="form-control" id="editTipoMovimiento" name="TipoMovimiento" required>
-                                    <option value="">Seleccione</option>
-                                    <option value="01">01</option>
-                                    <option value="02">02</option>
-                                    <option value="03">03</option>
-                                </select>
+                                <div class="custom-select-wrapper">
+                                    <select class="form-select" id="editTipoMovimiento" name="TipoMovimiento" required>
+                                        <option value="">Seleccione</option>
+                                        <option value="01">01</option>
+                                        <option value="02">02</option>
+                                        <option value="03">03</option>
+                                    </select>
+                                    <div class="invalid-feedback">El tipo de movimiento es obligatorio.</div>
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <label for="editTipoDocumento" class="form-label">Tipo de Documento</label>
-                                <select class="form-control" id="editTipoDocumento" name="TipoDocumento" required>
-                                    <option value="">Seleccione</option>
-                                    <option value="DN">DNI</option>
-                                    <option value="RU">RUC</option>
-                                    <option value="PA">PASAPORTE</option>
-                                </select>
+                                <div class="custom-select-wrapper">
+                                    <select class="form-select" id="editTipoDocumento" name="TipoDocumento" required>
+                                        <option value="">Seleccione</option>
+                                        <option value="DN">DNI</option>
+                                        <option value="RU">RUC</option>
+                                        <option value="PA">PASAPORTE</option>
+                                    </select>
+                                    <div class="invalid-feedback">El tipo de documento es obligatorio.</div>
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <label for="editNroDocumento" class="form-label">Número de Documento</label>
                                 <input type="text" class="form-control" id="editNroDocumento" name="NroDocumento" maxlength="50" required>
+                                <div class="invalid-feedback" id="editNroDocumentoFeedback"></div>
                             </div>
                             <div class="col-md-6">
                                 <label for="editCodItem2" class="form-label">Código de Ítem</label>
                                 <input type="text" class="form-control" id="editCodItem2" name="CodItem2" maxlength="50" required>
+                                <div class="invalid-feedback">El código de ítem es obligatorio y debe tener máximo 50 caracteres.</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="editProveedor" class="form-label">Proveedor</label>
@@ -297,10 +374,12 @@
                             <div class="col-md-6">
                                 <label for="editCantidad" class="form-label">Cantidad</label>
                                 <input type="number" class="form-control" id="editCantidad" name="Cantidad" min="1" required>
+                                <div class="invalid-feedback">La cantidad debe ser mayor que cero.</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="editFechaTransaccion" class="form-label">Fecha de Transacción</label>
                                 <input type="date" class="form-control" id="editFechaTransaccion" name="FechaTransaccion" required>
+                                <div class="invalid-feedback">La fecha de transacción es obligatoria.</div>
                             </div>
                         </div>
                     </form>
@@ -338,6 +417,65 @@
             button.innerHTML = `<span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span> ${text}`;
         }
 
+        function validateDocumentNumber(tipoDocumento, nroDocumento, feedbackElement) {
+            let isValid = true;
+            let message = '';
+
+            if (!nroDocumento) {
+                isValid = false;
+                message = 'El número de documento es obligatorio.';
+            } else if (tipoDocumento === 'DN') {
+                if (!/^\d{8}$/.test(nroDocumento)) {
+                    isValid = false;
+                    message = 'El DNI debe tener exactamente 8 dígitos numéricos.';
+                }
+            } else if (tipoDocumento === 'RU') {
+                if (!/^\d{11}$/.test(nroDocumento)) {
+                    isValid = false;
+                    message = 'El RUC debe tener exactamente 11 dígitos numéricos.';
+                }
+            } else if (tipoDocumento === 'PA') {
+                if (!/^[A-Za-z0-9]{1,12}$/.test(nroDocumento)) {
+                    isValid = false;
+                    message = 'El pasaporte debe tener hasta 12 caracteres alfanuméricos.';
+                }
+            } else {
+                isValid = false;
+                message = 'Seleccione un tipo de documento válido.';
+            }
+
+            if (!isValid) {
+                feedbackElement.textContent = message;
+                return false;
+            }
+            return true;
+        }
+
+        function setupDocumentValidation(formId, tipoDocId, nroDocId, feedbackId) {
+            const form = document.getElementById(formId);
+            const tipoDocumentoSelect = document.getElementById(tipoDocId);
+            const nroDocumentoInput = document.getElementById(nroDocId);
+            const feedbackElement = document.getElementById(feedbackId);
+
+            function validate() {
+                const tipoDocumento = tipoDocumentoSelect.value;
+                const nroDocumento = nroDocumentoInput.value.trim();
+                const isValid = validateDocumentNumber(tipoDocumento, nroDocumento, feedbackElement);
+                nroDocumentoInput.classList.toggle('is-invalid', !isValid);
+                return isValid;
+            }
+
+            tipoDocumentoSelect.addEventListener('change', validate);
+            nroDocumentoInput.addEventListener('input', validate);
+
+            form.addEventListener('submit', (e) => {
+                if (!validate()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+        }
+
         function displayRows(data) {
             const tableBody = document.getElementById('tableBody');
             if (!tableBody) {
@@ -368,14 +506,13 @@
                         <td>${formatDate(item.FechaTransaccion)}</td>
                         <td>${item.Estado || ''}</td>
                         <td>
-                            <button class="btn btn-sm btn-warning btn-custom" data-id="${item.IdMovimiento}"><i class="fas fa-edit"></i> Editar</button>
-                            <button class="btn btn-sm btn-danger btn-custom delete-btn" data-id="${item.IdMovimiento}"><i class="fas fa-trash"></i> Eliminar</button>
+                            <button class="btn btn-xs btn-warning btn-custom" data-id="${item.IdMovimiento}"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-xs btn-danger btn-custom delete-btn" data-id="${item.IdMovimiento}"><i class="fas fa-trash"></i></button>
                         </td>
                     `;
                     tableBody.appendChild(newRow);
                 });
 
-                // Reasignar eventos de edición
                 document.querySelectorAll('.btn-warning.btn-custom').forEach(button => {
                     button.addEventListener('click', async function () {
                         const id = this.getAttribute('data-id');
@@ -397,7 +534,6 @@
                                 throw new Error('Movimiento no encontrado.');
                             }
 
-                            // Precargar datos en el formulario de edición
                             document.getElementById('editIdMovimiento').value = movimiento.IdMovimiento || '';
                             document.getElementById('editCodCia').value = movimiento.CodCia || '';
                             document.getElementById('editCompaniaVenta3').value = movimiento.CompaniaVenta3 || '';
@@ -429,7 +565,6 @@
                     });
                 });
 
-                // Reasignar eventos de eliminación
                 document.querySelectorAll('.delete-btn').forEach(button => {
                     button.addEventListener('click', async function () {
                         const id = this.getAttribute('data-id');
@@ -449,7 +584,7 @@
                                     const timeoutId = setTimeout(() => controller.abort(), 10000);
 
                                     button.disabled = true;
-                                    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Eliminando...';
+                                    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
 
                                     const response = await fetch(`/MovInventario/Delete/${id}`, {
                                         method: 'POST',
@@ -468,9 +603,7 @@
                                         throw new Error(data.error);
                                     }
 
-                                    // Eliminar el registro de allData
                                     allData = allData.filter(item => item.IdMovimiento !== parseInt(id));
-                                    // Ajustar la página actual si es necesario
                                     const totalPages = Math.ceil(allData.length / rowsPerPage);
                                     if (currentPage > totalPages && totalPages > 0) {
                                         currentPage = totalPages;
@@ -492,7 +625,7 @@
                                     });
                                 } finally {
                                     button.disabled = false;
-                                    button.innerHTML = '<i class="fas fa-trash"></i> Eliminar';
+                                    button.innerHTML = '<i class="fas fa-trash"></i>';
                                 }
                             }
                         });
@@ -534,136 +667,164 @@
             allData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model)) || [];
             displayRows(allData);
 
+            // Configurar validación de documentos
+            setupDocumentValidation('createForm', 'tipoDocumento', 'nroDocumento', 'nroDocumentoFeedback');
+            setupDocumentValidation('editForm', 'editTipoDocumento', 'editNroDocumento', 'editNroDocumentoFeedback');
+
             createModalElement.addEventListener('show.bs.modal', () => {
                 createForm.reset();
+                const inputs = createForm.querySelectorAll('.form-control, .form-select');
+                inputs.forEach(input => input.classList.remove('is-invalid'));
             });
 
             saveAndContinueButton.addEventListener('click', async () => {
                 if (createForm.checkValidity()) {
-                    const button = saveAndContinueButton;
-                    const spinner = button.querySelector('.spinner-border');
-                    spinner.classList.remove('d-none');
-                    button.disabled = true;
-                    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...';
-
-                    const fechaTransaccion = document.getElementById('fechaTransaccion').value;
-                    if (!fechaTransaccion || isNaN(new Date(fechaTransaccion).getTime())) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'La fecha de transacción es inválida.' });
-                        resetButton(button, 'Guardar y Continuar');
+                    const tipoDocumento = document.getElementById('tipoDocumento').value;
+                    const nroDocumento = document.getElementById('nroDocumento').value.trim();
+                    const feedbackElement = document.getElementById('nroDocumentoFeedback');
+                    if (!validateDocumentNumber(tipoDocumento, nroDocumento, feedbackElement)) {
+                        document.getElementById('nroDocumento').classList.add('is-invalid');
                         return;
                     }
 
-                    const nuevoMovimiento = {
-                        CodCia: document.getElementById('codCia').value.trim(),
-                        CompaniaVenta3: document.getElementById('companiaVenta3').value.trim(),
-                        AlmacenVenta: document.getElementById('almacenVenta').value.trim(),
-                        TipoMovimiento: document.getElementById('tipoMovimientoCreate').value,
-                        TipoDocumento: document.getElementById('tipoDocumento').value,
-                        NroDocumento: document.getElementById('nroDocumento').value.trim(),
-                        CodItem2: document.getElementById('codItem2').value.trim(),
-                        Proveedor: document.getElementById('proveedor').value.trim() || null,
-                        AlmacenDestino: null,
-                        Cantidad: parseInt(document.getElementById('cantidad').value) || null,
-                        DocRef1: null,
-                        DocRef2: null,
-                        DocRef3: null,
-                        DocRef4: null,
-                        DocRef5: null,
-                        FechaTransaccion: fechaTransaccion,
-                        Estado: 'A'
-                    };
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: '¿Deseas guardar esta nueva información?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Sí, guardar',
+                        cancelButtonText: 'Cancelar'
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            const button = saveAndContinueButton;
+                            const spinner = button.querySelector('.spinner-border');
+                            spinner.classList.remove('d-none');
+                            button.disabled = true;
+                            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...';
 
-                    if (!nuevoMovimiento.CodCia || nuevoMovimiento.CodCia.length > 5) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'El código de compañía es obligatorio y debe tener máximo 5 caracteres.' });
-                        resetButton(button, 'Guardar y Continuar');
-                        return;
-                    }
-                    if (!nuevoMovimiento.CompaniaVenta3 || nuevoMovimiento.CompaniaVenta3.length > 5) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'La compañía de venta es obligatoria y debe tener máximo 5 caracteres.' });
-                        resetButton(button, 'Guardar y Continuar');
-                        return;
-                    }
-                    if (!nuevoMovimiento.AlmacenVenta || nuevoMovimiento.AlmacenVenta.length > 10) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'El almacén de venta es obligatorio y debe tener máximo 10 caracteres.' });
-                        resetButton(button, 'Guardar y Continuar');
-                        return;
-                    }
-                    if (!nuevoMovimiento.TipoMovimiento) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'El tipo de movimiento es obligatorio.' });
-                        resetButton(button, 'Guardar y Continuar');
-                        return;
-                    }
-                    if (!nuevoMovimiento.TipoDocumento) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'El tipo de documento es obligatorio.' });
-                        resetButton(button, 'Guardar y Continuar');
-                        return;
-                    }
-                    if (!nuevoMovimiento.NroDocumento || nuevoMovimiento.NroDocumento.length > 50) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'El número de documento es obligatorio y debe tener máximo 50 caracteres.' });
-                        resetButton(button, 'Guardar y Continuar');
-                        return;
-                    }
-                    if (!nuevoMovimiento.CodItem2 || nuevoMovimiento.CodItem2.length > 50) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'El código de ítem es obligatorio y debe tener máximo 50 caracteres.' });
-                        resetButton(button, 'Guardar y Continuar');
-                        return;
-                    }
-                    if (!nuevoMovimiento.Cantidad || nuevoMovimiento.Cantidad <= 0) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'La cantidad debe ser mayor que cero.' });
-                        resetButton(button, 'Guardar y Continuar');
-                        return;
-                    }
+                            const fechaTransaccion = document.getElementById('fechaTransaccion').value;
+                            if (!fechaTransaccion || isNaN(new Date(fechaTransaccion).getTime())) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'La fecha de transacción es inválida.' });
+                                resetButton(button, 'Guardar y Continuar');
+                                return;
+                            }
 
-                    try {
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 10000);
+                            const nuevoMovimiento = {
+                                CodCia: document.getElementById('codCia').value.trim(),
+                                CompaniaVenta3: document.getElementById('companiaVenta3').value.trim(),
+                                AlmacenVenta: document.getElementById('almacenVenta').value.trim(),
+                                TipoMovimiento: document.getElementById('tipoMovimientoCreate').value,
+                                TipoDocumento: tipoDocumento,
+                                NroDocumento: nroDocumento,
+                                CodItem2: document.getElementById('codItem2').value.trim(),
+                                Proveedor: document.getElementById('proveedor').value.trim() || null,
+                                AlmacenDestino: null,
+                                Cantidad: parseInt(document.getElementById('cantidad').value) || null,
+                                DocRef1: null,
+                                DocRef2: null,
+                                DocRef3: null,
+                                DocRef4: null,
+                                DocRef5: null,
+                                FechaTransaccion: fechaTransaccion,
+                                Estado: 'A'
+                            };
 
-                        const response = await fetch('/MovInventario/Create', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(nuevoMovimiento),
-                            signal: controller.signal
-                        });
+                            if (!nuevoMovimiento.CodCia || nuevoMovimiento.CodCia.length > 5) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'El código de compañía es obligatorio y debe tener máximo 5 caracteres.' });
+                                resetButton(button, 'Guardar y Continuar');
+                                return;
+                            }
+                            if (!nuevoMovimiento.CompaniaVenta3 || nuevoMovimiento.CompaniaVenta3.length > 5) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'La compañía de venta es obligatoria y debe tener máximo 5 caracteres.' });
+                                resetButton(button, 'Guardar y Continuar');
+                                return;
+                            }
+                            if (!nuevoMovimiento.AlmacenVenta || nuevoMovimiento.AlmacenVenta.length > 10) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'El almacén de venta es obligatorio y debe tener máximo 10 caracteres.' });
+                                resetButton(button, 'Guardar y Continuar');
+                                return;
+                            }
+                            if (!nuevoMovimiento.TipoMovimiento) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'El tipo de movimiento es obligatorio.' });
+                                resetButton(button, 'Guardar y Continuar');
+                                return;
+                            }
+                            if (!nuevoMovimiento.TipoDocumento) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'El tipo de documento es obligatorio.' });
+                                resetButton(button, 'Guardar y Continuar');
+                                return;
+                            }
+                            if (!nuevoMovimiento.NroDocumento || nuevoMovimiento.NroDocumento.length > 50) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'El número de documento es obligatorio y debe tener máximo 50 caracteres.' });
+                                resetButton(button, 'Guardar y Continuar');
+                                return;
+                            }
+                            if (!nuevoMovimiento.CodItem2 || nuevoMovimiento.CodItem2.length > 50) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'El código de ítem es obligatorio y debe tener máximo 50 caracteres.' });
+                                resetButton(button, 'Guardar y Continuar');
+                                return;
+                            }
+                            if (!nuevoMovimiento.Cantidad || nuevoMovimiento.Cantidad <= 0) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'La cantidad debe ser mayor que cero.' });
+                                resetButton(button, 'Guardar y Continuar');
+                                return;
+                            }
 
-                        clearTimeout(timeoutId);
+                            try {
+                                const controller = new AbortController();
+                                const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-                        if (!response.ok) {
-                            throw new Error(`Error al guardar: ${response.statusText}`);
+                                const response = await fetch('/MovInventario/Create', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(nuevoMovimiento),
+                                    signal: controller.signal
+                                });
+
+                                clearTimeout(timeoutId);
+
+                                if (!response.ok) {
+                                    throw new Error(`Error al guardar: ${response.statusText}`);
+                                }
+
+                                const data = await response.json();
+                                console.log('Datos recibidos del servidor:', data);
+
+                                if (data.error) {
+                                    throw new Error(data.error);
+                                }
+
+                                allData.push(data);
+                                allData.sort((a, b) => new Date(b.FechaTransaccion) - new Date(a.FechaTransaccion));
+                                const newIndex = allData.findIndex(item => item.IdMovimiento === data.IdMovimiento);
+                                currentPage = Math.floor(newIndex / rowsPerPage) + 1;
+
+                                displayRows(allData);
+                                createForm.reset();
+                                createForm.querySelectorAll('.form-control, .form-select').forEach(input => input.classList.remove('is-invalid'));
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Éxito',
+                                    text: 'Movimiento de inventario guardado correctamente.',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    button.focus();
+                                });
+                            } catch (error) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: `Ocurrió un error al guardar el movimiento: ${error.message}`
+                                });
+                            } finally {
+                                resetButton(button, 'Guardar y Continuar');
+                            }
                         }
-
-                        const data = await response.json();
-                        console.log('Datos recibidos del servidor:', data);
-
-                        if (data.error) {
-                            throw new Error(data.error);
-                        }
-
-                        allData.push(data);
-                        allData.sort((a, b) => new Date(b.FechaTransaccion) - new Date(a.FechaTransaccion));
-                        const newIndex = allData.findIndex(item => item.IdMovimiento === data.IdMovimiento);
-                        currentPage = Math.floor(newIndex / rowsPerPage) + 1;
-
-                        displayRows(allData);
-                        createForm.reset();
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Éxito',
-                            text: 'Movimiento de inventario guardado correctamente.',
-                            timer: 2000,
-                            showConfirmButton: false
-                        }).then(() => {
-                            button.focus();
-                        });
-                    } catch (error) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: `Ocurrió un error al guardar el movimiento: ${error.message}`
-                        });
-                    } finally {
-                        resetButton(button, 'Guardar y Continuar');
-                    }
+                    });
                 } else {
                     createForm.reportValidity();
                 }
@@ -671,135 +832,155 @@
 
             saveEditButton.addEventListener('click', async () => {
                 if (editForm.checkValidity()) {
-                    const button = saveEditButton;
-                    const spinner = button.querySelector('.spinner-border');
-                    spinner.classList.remove('d-none');
-                    button.disabled = true;
-                    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...';
-
-                    const fechaTransaccion = document.getElementById('editFechaTransaccion').value;
-                    if (!fechaTransaccion || isNaN(new Date(fechaTransaccion).getTime())) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'La fecha de transacción es inválida.' });
-                        resetButton(button, 'Guardar Cambios');
+                    const tipoDocumento = document.getElementById('editTipoDocumento').value;
+                    const nroDocumento = document.getElementById('editNroDocumento').value.trim();
+                    const feedbackElement = document.getElementById('editNroDocumentoFeedback');
+                    if (!validateDocumentNumber(tipoDocumento, nroDocumento, feedbackElement)) {
+                        document.getElementById('editNroDocumento').classList.add('is-invalid');
                         return;
                     }
 
-                    const updatedMovimiento = {
-                        IdMovimiento: parseInt(document.getElementById('editIdMovimiento').value),
-                        CodCia: document.getElementById('editCodCia').value.trim(),
-                        CompaniaVenta3: document.getElementById('editCompaniaVenta3').value.trim(),
-                        AlmacenVenta: document.getElementById('editAlmacenVenta').value.trim(),
-                        TipoMovimiento: document.getElementById('editTipoMovimiento').value,
-                        TipoDocumento: document.getElementById('editTipoDocumento').value,
-                        NroDocumento: document.getElementById('editNroDocumento').value.trim(),
-                        CodItem2: document.getElementById('editCodItem2').value.trim(),
-                        Proveedor: document.getElementById('editProveedor').value.trim() || null,
-                        AlmacenDestino: null,
-                        Cantidad: parseInt(document.getElementById('editCantidad').value) || null,
-                        DocRef1: null,
-                        DocRef2: null,
-                        DocRef3: null,
-                        DocRef4: null,
-                        DocRef5: null,
-                        FechaTransaccion: fechaTransaccion,
-                        Estado: 'A'
-                    };
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: '¿Deseas actualizar esta información?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Sí, actualizar',
+                        cancelButtonText: 'Cancelar'
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            const button = saveEditButton;
+                            const spinner = button.querySelector('.spinner-border');
+                            spinner.classList.remove('d-none');
+                            button.disabled = true;
+                            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...';
 
-                    if (!updatedMovimiento.IdMovimiento || updatedMovimiento.IdMovimiento <= 0) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'El ID del movimiento es obligatorio.' });
-                        resetButton(button, 'Guardar Cambios');
-                        return;
-                    }
-                    if (!updatedMovimiento.CodCia || updatedMovimiento.CodCia.length > 5) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'El código de compañía es obligatorio y debe tener máximo 5 caracteres.' });
-                        resetButton(button, 'Guardar Cambios');
-                        return;
-                    }
-                    if (!updatedMovimiento.CompaniaVenta3 || updatedMovimiento.CompaniaVenta3.length > 5) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'La compañía de venta es obligatoria y debe tener máximo 5 caracteres.' });
-                        resetButton(button, 'Guardar Cambios');
-                        return;
-                    }
-                    if (!updatedMovimiento.AlmacenVenta || updatedMovimiento.AlmacenVenta.length > 10) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'El almacén de venta es obligatorio y debe tener máximo 10 caracteres.' });
-                        resetButton(button, 'Guardar Cambios');
-                        return;
-                    }
-                    if (!updatedMovimiento.TipoMovimiento) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'El tipo de movimiento es obligatorio.' });
-                        resetButton(button, 'Guardar Cambios');
-                        return;
-                    }
-                    if (!updatedMovimiento.TipoDocumento) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'El tipo de documento es obligatorio.' });
-                        resetButton(button, 'Guardar Cambios');
-                        return;
-                    }
-                    if (!updatedMovimiento.NroDocumento || updatedMovimiento.NroDocumento.length > 50) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'El número de documento es obligatorio y debe tener máximo 50 caracteres.' });
-                        resetButton(button, 'Guardar Cambios');
-                        return;
-                    }
-                    if (!updatedMovimiento.CodItem2 || updatedMovimiento.CodItem2.length > 50) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'El código de ítem es obligatorio y debe tener máximo 50 caracteres.' });
-                        resetButton(button, 'Guardar Cambios');
-                        return;
-                    }
-                    if (!updatedMovimiento.Cantidad || updatedMovimiento.Cantidad <= 0) {
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'La cantidad debe ser mayor que cero.' });
-                        resetButton(button, 'Guardar Cambios');
-                        return;
-                    }
+                            const fechaTransaccion = document.getElementById('editFechaTransaccion').value;
+                            if (!fechaTransaccion || isNaN(new Date(fechaTransaccion).getTime())) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'La fecha de transacción es inválida.' });
+                                resetButton(button, 'Guardar Cambios');
+                                return;
+                            }
 
-                    try {
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 10000);
+                            const updatedMovimiento = {
+                                IdMovimiento: parseInt(document.getElementById('editIdMovimiento').value),
+                                CodCia: document.getElementById('editCodCia').value.trim(),
+                                CompaniaVenta3: document.getElementById('editCompaniaVenta3').value.trim(),
+                                AlmacenVenta: document.getElementById('editAlmacenVenta').value.trim(),
+                                TipoMovimiento: document.getElementById('editTipoMovimiento').value,
+                                TipoDocumento: tipoDocumento,
+                                NroDocumento: nroDocumento,
+                                CodItem2: document.getElementById('editCodItem2').value.trim(),
+                                Proveedor: document.getElementById('editProveedor').value.trim() || null,
+                                AlmacenDestino: null,
+                                Cantidad: parseInt(document.getElementById('editCantidad').value) || null,
+                                DocRef1: null,
+                                DocRef2: null,
+                                DocRef3: null,
+                                DocRef4: null,
+                                DocRef5: null,
+                                FechaTransaccion: fechaTransaccion,
+                                Estado: 'A'
+                            };
 
-                        const response = await fetch('/MovInventario/Edit', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(updatedMovimiento),
-                            signal: controller.signal
-                        });
+                            if (!updatedMovimiento.IdMovimiento || updatedMovimiento.IdMovimiento <= 0) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'El ID del movimiento es obligatorio.' });
+                                resetButton(button, 'Guardar Cambios');
+                                return;
+                            }
+                            if (!updatedMovimiento.CodCia || updatedMovimiento.CodCia.length > 5) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'El código de compañía es obligatorio y debe tener máximo 5 caracteres.' });
+                                resetButton(button, 'Guardar Cambios');
+                                return;
+                            }
+                            if (!updatedMovimiento.CompaniaVenta3 || updatedMovimiento.CompaniaVenta3.length > 5) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'La compañía de venta es obligatoria y debe tener máximo 5 caracteres.' });
+                                resetButton(button, 'Guardar Cambios');
+                                return;
+                            }
+                            if (!updatedMovimiento.AlmacenVenta || updatedMovimiento.AlmacenVenta.length > 10) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'El almacén de venta es obligatorio y debe tener máximo 10 caracteres.' });
+                                resetButton(button, 'Guardar Cambios');
+                                return;
+                            }
+                            if (!updatedMovimiento.TipoMovimiento) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'El tipo de movimiento es obligatorio.' });
+                                resetButton(button, 'Guardar Cambios');
+                                return;
+                            }
+                            if (!updatedMovimiento.TipoDocumento) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'El tipo de documento es obligatorio.' });
+                                resetButton(button, 'Guardar Cambios');
+                                return;
+                            }
+                            if (!updatedMovimiento.NroDocumento || updatedMovimiento.NroDocumento.length > 50) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'El número de documento es obligatorio y debe tener máximo 50 caracteres.' });
+                                resetButton(button, 'Guardar Cambios');
+                                return;
+                            }
+                            if (!updatedMovimiento.CodItem2 || updatedMovimiento.CodItem2.length > 50) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'El código de ítem es obligatorio y debe tener máximo 50 caracteres.' });
+                                resetButton(button, 'Guardar Cambios');
+                                return;
+                            }
+                            if (!updatedMovimiento.Cantidad || updatedMovimiento.Cantidad <= 0) {
+                                Swal.fire({ icon: 'error', title: 'Error', text: 'La cantidad debe ser mayor que cero.' });
+                                resetButton(button, 'Guardar Cambios');
+                                return;
+                            }
 
-                        clearTimeout(timeoutId);
+                            try {
+                                const controller = new AbortController();
+                                const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-                        if (!response.ok) {
-                            throw new Error(`Error al actualizar: ${response.statusText}`);
+                                const response = await fetch('/MovInventario/Edit', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(updatedMovimiento),
+                                    signal: controller.signal
+                                });
+
+                                clearTimeout(timeoutId);
+
+                                if (!response.ok) {
+                                    throw new Error(`Error al actualizar: ${response.statusText}`);
+                                }
+
+                                const data = await response.json();
+                                console.log('Datos recibidos del servidor:', data);
+
+                                if (data.error) {
+                                    throw new Error(data.error);
+                                }
+
+                                const index = allData.findIndex(item => item.IdMovimiento === data.IdMovimiento);
+                                if (index !== -1) {
+                                    allData[index] = data;
+                                    displayRows(allData);
+                                }
+
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Éxito',
+                                    text: 'Movimiento de inventario actualizado correctamente.',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+
+                                bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+                            } catch (error) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: `Ocurrió un error al actualizar el movimiento: ${error.message}`
+                                });
+                            } finally {
+                                resetButton(button, 'Guardar Cambios');
+                            }
                         }
-
-                        const data = await response.json();
-                        console.log('Datos recibidos del servidor:', data);
-
-                        if (data.error) {
-                            throw new Error(data.error);
-                        }
-
-                        // Actualizar el registro en allData
-                        const index = allData.findIndex(item => item.IdMovimiento === data.IdMovimiento);
-                        if (index !== -1) {
-                            allData[index] = data;
-                            displayRows(allData);
-                        }
-
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Éxito',
-                            text: 'Movimiento de inventario actualizado correctamente.',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-
-                        bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
-                    } catch (error) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: `Ocurrió un error al actualizar el movimiento: ${error.message}`
-                        });
-                    } finally {
-                        resetButton(button, 'Guardar Cambios');
-                    }
+                    });
                 } else {
                     editForm.reportValidity();
                 }
