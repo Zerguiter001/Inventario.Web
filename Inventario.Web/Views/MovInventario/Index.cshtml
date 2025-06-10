@@ -74,16 +74,8 @@
             }
 
         .custom-select-wrapper::after {
-            content: '\f078'; /* Font Awesome chevron-down icon */
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            color: #495057;
-            position: absolute;
-            right: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
-            font-size: 0.9rem;
+            z-index: 1;
+            right: 1rem; /* Ajusta según necesites */
         }
 
         th {
@@ -131,7 +123,7 @@
         <div class="card p-4 mb-4">
             <h2 class="mb-4"><i class="fas fa-warehouse me-2"></i> @ViewBag.Title</h2>
 
-            @using (Html.BeginForm("Index", "MovInventorsario", FormMethod.Get, new { @class = "row g-3 mb-4" }))
+            @using (Html.BeginForm("Index", "MovInventario", FormMethod.Get, new { @class = "row g-3 mb-4", id = "filterForm" }))
             {
                 <div class="col-md-3 col-sm-6">
                     <label for="fechaInicio" class="form-label">Fecha Inicio</label>
@@ -157,8 +149,8 @@
                     <input type="text" name="nroDocumento" class="form-control" value="@ViewBag.NroDocumento" />
                 </div>
                 <div class="col-12 mt-3">
-                    <button type="submit" class="btn btn-success btn-custom"><i class="fas fa-search me-2"></i>Buscar</button>
-                    <a href="@Url.Action("Index", "MovInventario")" class="btn btn-secondary btn-custom"><i class="fas fa-eraser me-2"></i>Limpiar</a>
+                    <button type="button" class="btn btn-success btn-custom" id="btnBuscar"><i class="fas fa-search me-2"></i>Buscar</button>
+                    <button type="button" class="btn btn-secondary btn-custom" id="btnLimpiar"><i class="fas fa-eraser me-2"></i>Limpiar</button>
                     <a href="#" class="btn btn-primary btn-custom float-end" data-bs-toggle="modal" data-bs-target="#createModal"><i class="fas fa-plus me-2"></i>Crear Nuevo</a>
                 </div>
             }
@@ -299,7 +291,7 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-success" id="saveAndContinueMovimiento">
                         <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                        Guardar y Continuar
+                        Guardar
                     </button>
                 </div>
             </div>
@@ -677,6 +669,96 @@
                 inputs.forEach(input => input.classList.remove('is-invalid'));
             });
 
+            // AJAX para el botón Buscar
+            document.getElementById('btnBuscar').addEventListener('click', async () => {
+                const form = document.getElementById('filterForm');
+                const formData = new FormData(form);
+                const params = new URLSearchParams(formData).toString();
+
+                try {
+                    const button = document.getElementById('btnBuscar');
+                    button.disabled = true;
+                    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Buscando...';
+
+                    const response = await fetch(`/MovInventario/Index?${params}`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const text = await response.text();
+                        throw new Error(`Error al aplicar el filtro: ${response.status} - ${text}`);
+                    }
+
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        const text = await response.text();
+                        throw new Error(`Respuesta no es JSON: ${text}`);
+                    }
+
+                    const data = await response.json();
+                    allData = data || [];
+                    currentPage = 1;
+                    displayRows(allData);
+                } catch (error) {
+                    console.error('Error en AJAX:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: `Ocurrió un error al filtrar: ${error.message}`
+                    });
+                } finally {
+                    resetButton(document.getElementById('btnBuscar'), '<i class="fas fa-search me-2"></i>Buscar');
+                }
+            });
+
+            // AJAX para el botón Limpiar
+            document.getElementById('btnLimpiar').addEventListener('click', async () => {
+                const form = document.getElementById('filterForm');
+                form.reset();
+                try {
+                    const button = document.getElementById('btnLimpiar');
+                    button.disabled = true;
+                    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Limpiando...';
+
+                    const response = await fetch(`/MovInventario/Index`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const text = await response.text();
+                        throw new Error(`Error al limpiar el filtro: ${response.status} - ${text}`);
+                    }
+
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        const text = await response.text();
+                        throw new Error(`Respuesta no es JSON: ${text}`);
+                    }
+
+                    const data = await response.json();
+                    allData = data || [];
+                    currentPage = 1;
+                    displayRows(allData);
+                } catch (error) {
+                    console.error('Error en AJAX:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: `Ocurrió un error al limpiar: ${error.message}`
+                    });
+                } finally {
+                    resetButton(document.getElementById('btnLimpiar'), '<i class="fas fa-eraser me-2"></i>Limpiar');
+                }
+            });
+
             saveAndContinueButton.addEventListener('click', async () => {
                 if (createForm.checkValidity()) {
                     const tipoDocumento = document.getElementById('tipoDocumento').value;
@@ -707,7 +789,7 @@
                             const fechaTransaccion = document.getElementById('fechaTransaccion').value;
                             if (!fechaTransaccion || isNaN(new Date(fechaTransaccion).getTime())) {
                                 Swal.fire({ icon: 'error', title: 'Error', text: 'La fecha de transacción es inválida.' });
-                                resetButton(button, 'Guardar y Continuar');
+                                resetButton(button, 'Guardar');
                                 return;
                             }
 
@@ -733,42 +815,42 @@
 
                             if (!nuevoMovimiento.CodCia || nuevoMovimiento.CodCia.length > 5) {
                                 Swal.fire({ icon: 'error', title: 'Error', text: 'El código de compañía es obligatorio y debe tener máximo 5 caracteres.' });
-                                resetButton(button, 'Guardar y Continuar');
+                                resetButton(button, 'Guardar');
                                 return;
                             }
                             if (!nuevoMovimiento.CompaniaVenta3 || nuevoMovimiento.CompaniaVenta3.length > 5) {
                                 Swal.fire({ icon: 'error', title: 'Error', text: 'La compañía de venta es obligatoria y debe tener máximo 5 caracteres.' });
-                                resetButton(button, 'Guardar y Continuar');
+                                resetButton(button, 'Guardar');
                                 return;
                             }
                             if (!nuevoMovimiento.AlmacenVenta || nuevoMovimiento.AlmacenVenta.length > 10) {
                                 Swal.fire({ icon: 'error', title: 'Error', text: 'El almacén de venta es obligatorio y debe tener máximo 10 caracteres.' });
-                                resetButton(button, 'Guardar y Continuar');
+                                resetButton(button, 'Guardar');
                                 return;
                             }
                             if (!nuevoMovimiento.TipoMovimiento) {
                                 Swal.fire({ icon: 'error', title: 'Error', text: 'El tipo de movimiento es obligatorio.' });
-                                resetButton(button, 'Guardar y Continuar');
+                                resetButton(button, 'Guardar');
                                 return;
                             }
                             if (!nuevoMovimiento.TipoDocumento) {
                                 Swal.fire({ icon: 'error', title: 'Error', text: 'El tipo de documento es obligatorio.' });
-                                resetButton(button, 'Guardar y Continuar');
+                                resetButton(button, 'Guardar');
                                 return;
                             }
                             if (!nuevoMovimiento.NroDocumento || nuevoMovimiento.NroDocumento.length > 50) {
                                 Swal.fire({ icon: 'error', title: 'Error', text: 'El número de documento es obligatorio y debe tener máximo 50 caracteres.' });
-                                resetButton(button, 'Guardar y Continuar');
+                                resetButton(button, 'Guardar');
                                 return;
                             }
                             if (!nuevoMovimiento.CodItem2 || nuevoMovimiento.CodItem2.length > 50) {
                                 Swal.fire({ icon: 'error', title: 'Error', text: 'El código de ítem es obligatorio y debe tener máximo 50 caracteres.' });
-                                resetButton(button, 'Guardar y Continuar');
+                                resetButton(button, 'Guardar');
                                 return;
                             }
                             if (!nuevoMovimiento.Cantidad || nuevoMovimiento.Cantidad <= 0) {
                                 Swal.fire({ icon: 'error', title: 'Error', text: 'La cantidad debe ser mayor que cero.' });
-                                resetButton(button, 'Guardar y Continuar');
+                                resetButton(button, 'Guardar');
                                 return;
                             }
 
@@ -821,7 +903,7 @@
                                     text: `Ocurrió un error al guardar el movimiento: ${error.message}`
                                 });
                             } finally {
-                                resetButton(button, 'Guardar y Continuar');
+                                resetButton(button, 'Guardar');
                             }
                         }
                     });

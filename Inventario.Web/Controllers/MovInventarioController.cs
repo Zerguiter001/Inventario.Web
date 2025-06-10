@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Web.Mvc;
 using Newtonsoft.Json;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Inventario.Web.Controllers
 {
@@ -20,14 +21,37 @@ namespace Inventario.Web.Controllers
 
         public ActionResult Index(DateTime? fechaInicio, DateTime? fechaFin, string tipoMovimiento, string nroDocumento)
         {
-            var resultado = _service.Consultar(fechaInicio, fechaFin, tipoMovimiento, nroDocumento);
+            try
+            {
+                var resultado = _service.Consultar(fechaInicio, fechaFin, tipoMovimiento, nroDocumento);
 
-            ViewBag.FechaInicio = fechaInicio?.ToString("yyyy-MM-dd");
-            ViewBag.FechaFin = fechaFin?.ToString("yyyy-MM-dd");
-            ViewBag.TipoMovimiento = tipoMovimiento;
-            ViewBag.NroDocumento = nroDocumento;
+                if (Request.IsAjaxRequest())
+                {
+                    var settings = new JsonSerializerSettings
+                    {
+                        DateFormatString = "yyyy-MM-dd",
+                        NullValueHandling = NullValueHandling.Ignore
+                    };
+                    string json = JsonConvert.SerializeObject(resultado, settings);
+                    return Content(json, "application/json");
+                }
 
-            return View(resultado);
+                ViewBag.FechaInicio = fechaInicio?.ToString("yyyy-MM-dd");
+                ViewBag.FechaFin = fechaFin?.ToString("yyyy-MM-dd");
+                ViewBag.TipoMovimiento = tipoMovimiento;
+                ViewBag.NroDocumento = nroDocumento;
+
+                return View(resultado);
+            }
+            catch (Exception ex)
+            {
+                if (Request.IsAjaxRequest())
+                {
+                    return Json(new { error = $"Error al consultar movimientos: {ex.Message}" }, JsonRequestBehavior.AllowGet);
+                }
+                ViewBag.Error = $"Error al consultar movimientos: {ex.Message}";
+                return View(new List<MovInventario>());
+            }
         }
 
         [HttpPost]
