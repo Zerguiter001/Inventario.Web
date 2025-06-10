@@ -4,7 +4,7 @@ using System;
 using System.Configuration;
 using System.Web.Mvc;
 using Newtonsoft.Json;
-using System.Linq; 
+using System.Linq;
 
 namespace Inventario.Web.Controllers
 {
@@ -118,12 +118,22 @@ namespace Inventario.Web.Controllers
         {
             try
             {
-                _service.Eliminar(id);
-                return Json(new { success = true });
+                var resultado = _service.Eliminar(id);
+                if (resultado != null)
+                {
+                    var settings = new JsonSerializerSettings
+                    {
+                        DateFormatString = "yyyy-MM-dd",
+                        NullValueHandling = NullValueHandling.Ignore
+                    };
+                    string json = JsonConvert.SerializeObject(resultado, settings);
+                    return Content(json, "application/json");
+                }
+                return Json(new { error = "No se pudo marcar el movimiento como inactivo." });
             }
             catch (Exception ex)
             {
-                return Json(new { error = $"Error al eliminar el movimiento: {ex.Message}" });
+                return Json(new { error = $"Error al marcar el movimiento como inactivo: {ex.Message}" });
             }
         }
     }

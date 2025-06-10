@@ -316,25 +316,6 @@
         </div>
     </div>
 
-    <!-- Modal de Confirmación para Eliminar -->
-    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Estás seguro de que deseas eliminar este movimiento de inventario?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" id="confirmDeleteBtn" class="btn btn-danger">Eliminar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
     <script>
@@ -348,6 +329,13 @@
             if (parts.length !== 3) return '';
             const [year, month, day] = parts;
             return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
+        }
+
+        function resetButton(button, text) {
+            const spinner = button.querySelector('.spinner-border');
+            spinner.classList.add('d-none');
+            button.disabled = false;
+            button.innerHTML = `<span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span> ${text}`;
         }
 
         function displayRows(data) {
@@ -440,6 +428,76 @@
                         }
                     });
                 });
+
+                // Reasignar eventos de eliminación
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', async function () {
+                        const id = this.getAttribute('data-id');
+                        Swal.fire({
+                            title: '¿Estás seguro?',
+                            text: '¿Deseas marcar este movimiento de inventario como inactivo?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#3085d6',
+                            confirmButtonText: 'Sí, eliminar',
+                            cancelButtonText: 'Cancelar'
+                        }).then(async (result) => {
+                            if (result.isConfirmed) {
+                                try {
+                                    const controller = new AbortController();
+                                    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+                                    button.disabled = true;
+                                    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Eliminando...';
+
+                                    const response = await fetch(`/MovInventario/Delete/${id}`, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        signal: controller.signal
+                                    });
+
+                                    clearTimeout(timeoutId);
+
+                                    if (!response.ok) {
+                                        throw new Error(`Error al marcar como inactivo: ${response.statusText}`);
+                                    }
+
+                                    const data = await response.json();
+                                    if (data.error) {
+                                        throw new Error(data.error);
+                                    }
+
+                                    // Eliminar el registro de allData
+                                    allData = allData.filter(item => item.IdMovimiento !== parseInt(id));
+                                    // Ajustar la página actual si es necesario
+                                    const totalPages = Math.ceil(allData.length / rowsPerPage);
+                                    if (currentPage > totalPages && totalPages > 0) {
+                                        currentPage = totalPages;
+                                    }
+                                    displayRows(allData);
+
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Éxito',
+                                        text: 'Movimiento de inventario eliminado correctamente.',
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    });
+                                } catch (error) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: `Ocurrió un error al eliminar el movimiento: ${error.message}`
+                                    });
+                                } finally {
+                                    button.disabled = false;
+                                    button.innerHTML = '<i class="fas fa-trash"></i> Eliminar';
+                                }
+                            }
+                        });
+                    });
+                });
             }
 
             setupPagination(data);
@@ -467,9 +525,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            const deleteButtons = document.querySelectorAll('.delete-btn');
-            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-            const deleteModalElement = document.getElementById('confirmDeleteModal');
             const createModalElement = document.getElementById('createModal');
             const saveAndContinueButton = document.getElementById('saveAndContinueMovimiento');
             const createForm = document.getElementById('createForm');
@@ -478,58 +533,6 @@
 
             allData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model)) || [];
             displayRows(allData);
-
-            deleteButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const id = this.getAttribute('data-id');
-                    confirmDeleteBtn.setAttribute('data-id', id);
-                    bootstrap.Modal.getOrCreateInstance(deleteModalElement).show();
-                });
-            });
-
-            confirmDeleteBtn.addEventListener('click', async () => {
-                const id = confirmDeleteBtn.getAttribute('data-id');
-                try {
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-                    const response = await fetch(`/MovInventario/Delete/${id}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        signal: controller.signal
-                    });
-
-                    clearTimeout(timeoutId);
-
-                    if (!response.ok) {
-                        throw new Error(`Error al eliminar: ${response.statusText}`);
-                    }
-
-                    const data = await response.json();
-                    if (data.error) {
-                        throw new Error(data.error);
-                    }
-
-                    allData = allData.filter(item => item.IdMovimiento !== parseInt(id));
-                    displayRows(allData);
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Éxito',
-                        text: 'Movimiento de inventario eliminado correctamente.',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-
-                    bootstrap.Modal.getInstance(deleteModalElement).hide();
-                } catch (error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: `Ocurrió un error al eliminar el movimiento: ${error.message}`
-                    });
-                }
-            });
 
             createModalElement.addEventListener('show.bs.modal', () => {
                 createForm.reset();
@@ -546,7 +549,7 @@
                     const fechaTransaccion = document.getElementById('fechaTransaccion').value;
                     if (!fechaTransaccion || isNaN(new Date(fechaTransaccion).getTime())) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'La fecha de transacción es inválida.' });
-                        resetButton(button);
+                        resetButton(button, 'Guardar y Continuar');
                         return;
                     }
 
@@ -572,42 +575,42 @@
 
                     if (!nuevoMovimiento.CodCia || nuevoMovimiento.CodCia.length > 5) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'El código de compañía es obligatorio y debe tener máximo 5 caracteres.' });
-                        resetButton(button);
+                        resetButton(button, 'Guardar y Continuar');
                         return;
                     }
                     if (!nuevoMovimiento.CompaniaVenta3 || nuevoMovimiento.CompaniaVenta3.length > 5) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'La compañía de venta es obligatoria y debe tener máximo 5 caracteres.' });
-                        resetButton(button);
+                        resetButton(button, 'Guardar y Continuar');
                         return;
                     }
                     if (!nuevoMovimiento.AlmacenVenta || nuevoMovimiento.AlmacenVenta.length > 10) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'El almacén de venta es obligatorio y debe tener máximo 10 caracteres.' });
-                        resetButton(button);
+                        resetButton(button, 'Guardar y Continuar');
                         return;
                     }
                     if (!nuevoMovimiento.TipoMovimiento) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'El tipo de movimiento es obligatorio.' });
-                        resetButton(button);
+                        resetButton(button, 'Guardar y Continuar');
                         return;
                     }
                     if (!nuevoMovimiento.TipoDocumento) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'El tipo de documento es obligatorio.' });
-                        resetButton(button);
+                        resetButton(button, 'Guardar y Continuar');
                         return;
                     }
                     if (!nuevoMovimiento.NroDocumento || nuevoMovimiento.NroDocumento.length > 50) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'El número de documento es obligatorio y debe tener máximo 50 caracteres.' });
-                        resetButton(button);
+                        resetButton(button, 'Guardar y Continuar');
                         return;
                     }
                     if (!nuevoMovimiento.CodItem2 || nuevoMovimiento.CodItem2.length > 50) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'El código de ítem es obligatorio y debe tener máximo 50 caracteres.' });
-                        resetButton(button);
+                        resetButton(button, 'Guardar y Continuar');
                         return;
                     }
                     if (!nuevoMovimiento.Cantidad || nuevoMovimiento.Cantidad <= 0) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'La cantidad debe ser mayor que cero.' });
-                        resetButton(button);
+                        resetButton(button, 'Guardar y Continuar');
                         return;
                     }
 
@@ -659,7 +662,7 @@
                             text: `Ocurrió un error al guardar el movimiento: ${error.message}`
                         });
                     } finally {
-                        resetButton(button);
+                        resetButton(button, 'Guardar y Continuar');
                     }
                 } else {
                     createForm.reportValidity();
@@ -677,7 +680,7 @@
                     const fechaTransaccion = document.getElementById('editFechaTransaccion').value;
                     if (!fechaTransaccion || isNaN(new Date(fechaTransaccion).getTime())) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'La fecha de transacción es inválida.' });
-                        resetEditButton(button);
+                        resetButton(button, 'Guardar Cambios');
                         return;
                     }
 
@@ -704,47 +707,47 @@
 
                     if (!updatedMovimiento.IdMovimiento || updatedMovimiento.IdMovimiento <= 0) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'El ID del movimiento es obligatorio.' });
-                        resetEditButton(button);
+                        resetButton(button, 'Guardar Cambios');
                         return;
                     }
                     if (!updatedMovimiento.CodCia || updatedMovimiento.CodCia.length > 5) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'El código de compañía es obligatorio y debe tener máximo 5 caracteres.' });
-                        resetEditButton(button);
+                        resetButton(button, 'Guardar Cambios');
                         return;
                     }
                     if (!updatedMovimiento.CompaniaVenta3 || updatedMovimiento.CompaniaVenta3.length > 5) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'La compañía de venta es obligatoria y debe tener máximo 5 caracteres.' });
-                        resetEditButton(button);
+                        resetButton(button, 'Guardar Cambios');
                         return;
                     }
                     if (!updatedMovimiento.AlmacenVenta || updatedMovimiento.AlmacenVenta.length > 10) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'El almacén de venta es obligatorio y debe tener máximo 10 caracteres.' });
-                        resetEditButton(button);
+                        resetButton(button, 'Guardar Cambios');
                         return;
                     }
                     if (!updatedMovimiento.TipoMovimiento) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'El tipo de movimiento es obligatorio.' });
-                        resetEditButton(button);
+                        resetButton(button, 'Guardar Cambios');
                         return;
                     }
                     if (!updatedMovimiento.TipoDocumento) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'El tipo de documento es obligatorio.' });
-                        resetEditButton(button);
+                        resetButton(button, 'Guardar Cambios');
                         return;
                     }
                     if (!updatedMovimiento.NroDocumento || updatedMovimiento.NroDocumento.length > 50) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'El número de documento es obligatorio y debe tener máximo 50 caracteres.' });
-                        resetEditButton(button);
+                        resetButton(button, 'Guardar Cambios');
                         return;
                     }
                     if (!updatedMovimiento.CodItem2 || updatedMovimiento.CodItem2.length > 50) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'El código de ítem es obligatorio y debe tener máximo 50 caracteres.' });
-                        resetEditButton(button);
+                        resetButton(button, 'Guardar Cambios');
                         return;
                     }
                     if (!updatedMovimiento.Cantidad || updatedMovimiento.Cantidad <= 0) {
                         Swal.fire({ icon: 'error', title: 'Error', text: 'La cantidad debe ser mayor que cero.' });
-                        resetEditButton(button);
+                        resetButton(button, 'Guardar Cambios');
                         return;
                     }
 
@@ -766,14 +769,16 @@
                         }
 
                         const data = await response.json();
+                        console.log('Datos recibidos del servidor:', data);
+
                         if (data.error) {
                             throw new Error(data.error);
                         }
 
-                        const index = allData.findIndex(item => item.IdMovimiento === updatedMovimiento.IdMovimiento);
+                        // Actualizar el registro en allData
+                        const index = allData.findIndex(item => item.IdMovimiento === data.IdMovimiento);
                         if (index !== -1) {
                             allData[index] = data;
-                            allData.sort((a, b) => new Date(b.FechaTransaccion) - new Date(a.FechaTransaccion));
                             displayRows(allData);
                         }
 
@@ -793,26 +798,12 @@
                             text: `Ocurrió un error al actualizar el movimiento: ${error.message}`
                         });
                     } finally {
-                        resetEditButton(button);
+                        resetButton(button, 'Guardar Cambios');
                     }
                 } else {
                     editForm.reportValidity();
                 }
             });
-
-            function resetButton(button) {
-                const spinner = button.querySelector('.spinner-border');
-                spinner.classList.add('d-none');
-                button.disabled = false;
-                button.innerHTML = '<span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span> Guardar y Continuar';
-            }
-
-            function resetEditButton(button) {
-                const spinner = button.querySelector('.spinner-border');
-                spinner.classList.add('d-none');
-                button.disabled = false;
-                button.innerHTML = '<span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span> Guardar Cambios';
-            }
         });
     </script>
 </body>

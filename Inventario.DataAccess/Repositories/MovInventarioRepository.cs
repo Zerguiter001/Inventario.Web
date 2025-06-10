@@ -128,8 +128,8 @@ namespace Inventario.DataAccess.Repositories
                     throw new ArgumentException("La compañía de venta es obligatoria y debe tener máximo 5 caracteres.");
                 if (string.IsNullOrWhiteSpace(movimiento.AlmacenVenta) || movimiento.AlmacenVenta.Length > 10)
                     throw new ArgumentException("El almacén de venta es obligatorio y debe tener máximo 10 caracteres.");
-                if (string.IsNullOrWhiteSpace(movimiento.TipoMovimiento) || !new[] { "01", "02", "03", "04", "05" }.Contains(movimiento.TipoMovimiento))
-                    throw new ArgumentException("El tipo de movimiento es obligatorio y debe ser uno de: 01, 02, 03, 04, 05.");
+                if (string.IsNullOrWhiteSpace(movimiento.TipoMovimiento) || !new[] { "01", "02", "03" }.Contains(movimiento.TipoMovimiento))
+                    throw new ArgumentException("El tipo de movimiento es obligatorio y debe ser uno de: 01, 02, 03.");
                 if (string.IsNullOrWhiteSpace(movimiento.TipoDocumento) || !new[] { "DN", "RU", "PA" }.Contains(movimiento.TipoDocumento))
                     throw new ArgumentException("El tipo de documento es obligatorio y debe ser uno de: DN, RU, PA.");
                 if (string.IsNullOrWhiteSpace(movimiento.NroDocumento) || movimiento.NroDocumento.Length > 50)
@@ -152,8 +152,6 @@ namespace Inventario.DataAccess.Repositories
                     throw new ArgumentException("El documento de referencia 4 debe tener máximo 50 caracteres.");
                 if (movimiento.DocRef5 != null && movimiento.DocRef5.Length > 50)
                     throw new ArgumentException("El documento de referencia 5 debe tener máximo 50 caracteres.");
-                if (string.IsNullOrWhiteSpace(movimiento.Estado) || !new[] { "A", "I", "P" }.Contains(movimiento.Estado))
-                    throw new ArgumentException("El estado debe ser uno de: A, I, P.");
                 if (!movimiento.FechaTransaccion.HasValue)
                     movimiento.FechaTransaccion = DateTime.Now;
 
@@ -177,7 +175,7 @@ namespace Inventario.DataAccess.Repositories
                     cmd.Parameters.Add("@DOC_REF_4", SqlDbType.VarChar, 50).Value = (object)movimiento.DocRef4 ?? DBNull.Value;
                     cmd.Parameters.Add("@DOC_REF_5", SqlDbType.VarChar, 50).Value = (object)movimiento.DocRef5 ?? DBNull.Value;
                     cmd.Parameters.Add("@FECHA_TRANSACCION", SqlDbType.Date).Value = (object)movimiento.FechaTransaccion ?? DBNull.Value;
-                    cmd.Parameters.Add("@ESTADO", SqlDbType.VarChar, 1).Value = movimiento.Estado;
+                    cmd.Parameters.Add("@ESTADO", SqlDbType.VarChar, 1).Value = movimiento.Estado ?? "A";
 
                     conn.Open();
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -233,8 +231,8 @@ namespace Inventario.DataAccess.Repositories
                     throw new ArgumentException("La compañía de venta es obligatoria y debe tener máximo 5 caracteres.");
                 if (string.IsNullOrWhiteSpace(movimiento.AlmacenVenta) || movimiento.AlmacenVenta.Length > 10)
                     throw new ArgumentException("El almacén de venta es obligatorio y debe tener máximo 10 caracteres.");
-                if (string.IsNullOrWhiteSpace(movimiento.TipoMovimiento) || !new[] { "01", "02", "03", "04", "05" }.Contains(movimiento.TipoMovimiento))
-                    throw new ArgumentException("El tipo de movimiento es obligatorio y debe ser uno de: 01, 02, 03, 04, 05.");
+                if (string.IsNullOrWhiteSpace(movimiento.TipoMovimiento) || !new[] { "01", "02", "03" }.Contains(movimiento.TipoMovimiento))
+                    throw new ArgumentException("El tipo de movimiento es obligatorio y debe ser uno de: 01, 02, 03.");
                 if (string.IsNullOrWhiteSpace(movimiento.TipoDocumento) || !new[] { "DN", "RU", "PA" }.Contains(movimiento.TipoDocumento))
                     throw new ArgumentException("El tipo de documento es obligatorio y debe ser uno de: DN, RU, PA.");
                 if (string.IsNullOrWhiteSpace(movimiento.NroDocumento) || movimiento.NroDocumento.Length > 50)
@@ -257,8 +255,6 @@ namespace Inventario.DataAccess.Repositories
                     throw new ArgumentException("El documento de referencia 4 debe tener máximo 50 caracteres.");
                 if (movimiento.DocRef5 != null && movimiento.DocRef5.Length > 50)
                     throw new ArgumentException("El documento de referencia 5 debe tener máximo 50 caracteres.");
-                if (string.IsNullOrWhiteSpace(movimiento.Estado) || !new[] { "A", "I", "P" }.Contains(movimiento.Estado))
-                    throw new ArgumentException("El estado debe ser uno de: A, I, P.");
                 if (!movimiento.FechaTransaccion.HasValue)
                     movimiento.FechaTransaccion = DateTime.Now;
 
@@ -283,7 +279,7 @@ namespace Inventario.DataAccess.Repositories
                     cmd.Parameters.Add("@DOC_REF_4", SqlDbType.VarChar, 50).Value = (object)movimiento.DocRef4 ?? DBNull.Value;
                     cmd.Parameters.Add("@DOC_REF_5", SqlDbType.VarChar, 50).Value = (object)movimiento.DocRef5 ?? DBNull.Value;
                     cmd.Parameters.Add("@FECHA_TRANSACCION", SqlDbType.Date).Value = (object)movimiento.FechaTransaccion ?? DBNull.Value;
-                    cmd.Parameters.Add("@ESTADO", SqlDbType.VarChar, 1).Value = movimiento.Estado;
+                    cmd.Parameters.Add("@ESTADO", SqlDbType.VarChar, 1).Value = movimiento.Estado ?? "A";
 
                     conn.Open();
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -326,7 +322,7 @@ namespace Inventario.DataAccess.Repositories
             return null;
         }
 
-        public void Eliminar(int idMovimiento)
+        public MovInventario Eliminar(int idMovimiento)
         {
             try
             {
@@ -337,7 +333,33 @@ namespace Inventario.DataAccess.Repositories
                     cmd.Parameters.Add("@ID_MOVIMIENTO", SqlDbType.Int).Value = idMovimiento;
 
                     conn.Open();
-                    cmd.ExecuteNonQuery();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new MovInventario
+                            {
+                                IdMovimiento = Convert.ToInt32(reader["ID_MOVIMIENTO"]),
+                                CodCia = reader["COD_CIA"] != DBNull.Value ? reader["COD_CIA"].ToString() : null,
+                                CompaniaVenta3 = reader["COMPANIA_VENTA_3"] != DBNull.Value ? reader["COMPANIA_VENTA_3"].ToString() : null,
+                                AlmacenVenta = reader["ALMACEN_VENTA"] != DBNull.Value ? reader["ALMACEN_VENTA"].ToString() : null,
+                                TipoMovimiento = reader["TIPO_MOVIMIENTO"] != DBNull.Value ? reader["TIPO_MOVIMIENTO"].ToString() : null,
+                                TipoDocumento = reader["TIPO_DOCUMENTO"] != DBNull.Value ? reader["TIPO_DOCUMENTO"].ToString() : null,
+                                NroDocumento = reader["NRO_DOCUMENTO"] != DBNull.Value ? reader["NRO_DOCUMENTO"].ToString() : null,
+                                CodItem2 = reader["COD_ITEM_2"] != DBNull.Value ? reader["COD_ITEM_2"].ToString() : null,
+                                Proveedor = reader["PROVEEDOR"] != DBNull.Value ? reader["PROVEEDOR"].ToString() : null,
+                                AlmacenDestino = reader["ALMACEN_DESTINO"] != DBNull.Value ? reader["ALMACEN_DESTINO"].ToString() : null,
+                                Cantidad = reader["CANTIDAD"] != DBNull.Value ? (int?)Convert.ToInt32(reader["CANTIDAD"]) : null,
+                                DocRef1 = reader["DOC_REF_1"] != DBNull.Value ? reader["DOC_REF_1"].ToString() : null,
+                                DocRef2 = reader["DOC_REF_2"] != DBNull.Value ? reader["DOC_REF_2"].ToString() : null,
+                                DocRef3 = reader["DOC_REF_3"] != DBNull.Value ? reader["DOC_REF_3"].ToString() : null,
+                                DocRef4 = reader["DOC_REF_4"] != DBNull.Value ? reader["DOC_REF_4"].ToString() : null,
+                                DocRef5 = reader["DOC_REF_5"] != DBNull.Value ? reader["DOC_REF_5"].ToString() : null,
+                                FechaTransaccion = reader["FECHA_TRANSACCION"] != DBNull.Value ? (DateTime?)DateTime.Parse(reader["FECHA_TRANSACCION"].ToString()) : null,
+                                Estado = reader["ESTADO"] != DBNull.Value ? reader["ESTADO"].ToString() : null
+                            };
+                        }
+                    }
                 }
             }
             catch (SqlException ex)
@@ -348,6 +370,7 @@ namespace Inventario.DataAccess.Repositories
             {
                 throw new Exception($"Error al eliminar movimiento de inventario: {ex.Message}", ex);
             }
+            return null;
         }
     }
 }

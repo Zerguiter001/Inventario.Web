@@ -48,11 +48,11 @@ namespace Inventario.BusinessLogic.Services
             }
         }
 
-        public void Eliminar(int idMovimiento)
+        public MovInventario Eliminar(int idMovimiento)
         {
             try
             {
-                _repository.Eliminar(idMovimiento);
+                return _repository.Eliminar(idMovimiento);
             }
             catch (Exception ex)
             {
