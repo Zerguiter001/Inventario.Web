@@ -1,12 +1,105 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\Natalie\\Documents\\Inventario\\Inventario.Web\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{4E962AFF-3414-4C4D-AE29-1DD4231409CF}|Inventario.Web\\Inventario.Web.csproj|c:\\users\\natalie\\documents\\inventario\\inventario.web\\inventario.web\\views\\movinventario\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{4E962AFF-3414-4C4D-AE29-1DD4231409CF}|Inventario.Web\\Inventario.Web.csproj|solutionrelative:inventario.web\\views\\movinventario\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E0BC00A4-AA27-4ED4-A111-077AF73C02C8}|Inventario.DataAccess\\Inventario.DataAccess.csproj|C:\\Users\\Natalie\\Documents\\Inventario\\Inventario.Web\\inventario.dataaccess\\repositories\\movinventariorepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E0BC00A4-AA27-4ED4-A111-077AF73C02C8}|Inventario.DataAccess\\Inventario.DataAccess.csproj|solutionrelative:inventario.dataaccess\\repositories\\movinventariorepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4E962AFF-3414-4C4D-AE29-1DD4231409CF}|Inventario.Web\\Inventario.Web.csproj|C:\\Users\\Natalie\\Documents\\Inventario\\Inventario.Web\\inventario.web\\controllers\\movinventariocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4E962AFF-3414-4C4D-AE29-1DD4231409CF}|Inventario.Web\\Inventario.Web.csproj|solutionrelative:inventario.web\\controllers\\movinventariocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8A24499D-CF28-433E-9A74-38AF1B65496F}|Inventario.BusinessLogic\\Inventario.BusinessLogic.csproj|C:\\Users\\Natalie\\Documents\\Inventario\\Inventario.Web\\inventario.businesslogic\\services\\movinventarioservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8A24499D-CF28-433E-9A74-38AF1B65496F}|Inventario.BusinessLogic\\Inventario.BusinessLogic.csproj|solutionrelative:inventario.businesslogic\\services\\movinventarioservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{33DD19A5-E7D1-4759-B197-F5EF68030301}|Inventario.Entities\\Inventario.Entities.csproj|c:\\users\\natalie\\documents\\inventario\\inventario.web\\inventario.entities\\movinventario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{33DD19A5-E7D1-4759-B197-F5EF68030301}|Inventario.Entities\\Inventario.Entities.csproj|solutionrelative:inventario.entities\\movinventario.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
       "VerticalTabListWidth": 256,
-      "DocumentGroups": []
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MovInventario.cs",
+              "DocumentMoniker": "C:\\Users\\Natalie\\Documents\\Inventario\\Inventario.Web\\Inventario.Entities\\MovInventario.cs",
+              "RelativeDocumentMoniker": "Inventario.Entities\\MovInventario.cs",
+              "ToolTip": "C:\\Users\\Natalie\\Documents\\Inventario\\Inventario.Web\\Inventario.Entities\\MovInventario.cs",
+              "RelativeToolTip": "Inventario.Entities\\MovInventario.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAcwB0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-10T01:38:13.051Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\Natalie\\Documents\\Inventario\\Inventario.Web\\Inventario.Web\\Views\\MovInventario\\Index.cshtml",
+              "RelativeDocumentMoniker": "Inventario.Web\\Views\\MovInventario\\Index.cshtml",
+              "ToolTip": "C:\\Users\\Natalie\\Documents\\Inventario\\Inventario.Web\\Inventario.Web\\Views\\MovInventario\\Index.cshtml",
+              "RelativeToolTip": "Inventario.Web\\Views\\MovInventario\\Index.cshtml",
+              "ViewState": "AgIAAKQBAAAAAAAAAAAswLABAAByAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-06-09T19:19:49.349Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "MovInventarioRepository.cs",
+              "DocumentMoniker": "C:\\Users\\Natalie\\Documents\\Inventario\\Inventario.Web\\Inventario.DataAccess\\Repositories\\MovInventarioRepository.cs",
+              "RelativeDocumentMoniker": "Inventario.DataAccess\\Repositories\\MovInventarioRepository.cs",
+              "ToolTip": "C:\\Users\\Natalie\\Documents\\Inventario\\Inventario.Web\\Inventario.DataAccess\\Repositories\\MovInventarioRepository.cs",
+              "RelativeToolTip": "Inventario.DataAccess\\Repositories\\MovInventarioRepository.cs",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAcwGABAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-09T18:55:21.692Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "MovInventarioService.cs",
+              "DocumentMoniker": "C:\\Users\\Natalie\\Documents\\Inventario\\Inventario.Web\\Inventario.BusinessLogic\\Services\\MovInventarioService.cs",
+              "RelativeDocumentMoniker": "Inventario.BusinessLogic\\Services\\MovInventarioService.cs",
+              "ToolTip": "C:\\Users\\Natalie\\Documents\\Inventario\\Inventario.Web\\Inventario.BusinessLogic\\Services\\MovInventarioService.cs",
+              "RelativeToolTip": "Inventario.BusinessLogic\\Services\\MovInventarioService.cs",
+              "ViewState": "AgIAAC4AAAAAAAAAAAAYwD4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-09T19:05:23.714Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MovInventarioController.cs",
+              "DocumentMoniker": "C:\\Users\\Natalie\\Documents\\Inventario\\Inventario.Web\\Inventario.Web\\Controllers\\MovInventarioController.cs",
+              "RelativeDocumentMoniker": "Inventario.Web\\Controllers\\MovInventarioController.cs",
+              "ToolTip": "C:\\Users\\Natalie\\Documents\\Inventario\\Inventario.Web\\Inventario.Web\\Controllers\\MovInventarioController.cs",
+              "RelativeToolTip": "Inventario.Web\\Controllers\\MovInventarioController.cs",
+              "ViewState": "AgIAAHEAAAAAAAAAAAAYwIEAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-06-09T19:13:07.674Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
     }
   ]
 }

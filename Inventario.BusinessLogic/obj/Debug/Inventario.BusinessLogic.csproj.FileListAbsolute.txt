@@ -1,0 +1,11 @@
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.BusinessLogic\bin\Debug\Inventario.BusinessLogic.dll
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.BusinessLogic\bin\Debug\Inventario.BusinessLogic.pdb
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.BusinessLogic\bin\Debug\Inventario.DataAccess.dll
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.BusinessLogic\bin\Debug\Inventario.Entities.dll
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.BusinessLogic\bin\Debug\Inventario.DataAccess.pdb
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.BusinessLogic\bin\Debug\Inventario.Entities.pdb
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.BusinessLogic\obj\Debug\Inventario.BusinessLogic.csproj.AssemblyReference.cache
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.BusinessLogic\obj\Debug\Inventario.BusinessLogic.csproj.CoreCompileInputs.cache
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.BusinessLogic\obj\Debug\Inventar.17DAA5A8.Up2Date
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.BusinessLogic\obj\Debug\Inventario.BusinessLogic.dll
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.BusinessLogic\obj\Debug\Inventario.BusinessLogic.pdb

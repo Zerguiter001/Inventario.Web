@@ -1,0 +1,6 @@
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.Entities\bin\Debug\Inventario.Entities.dll
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.Entities\bin\Debug\Inventario.Entities.pdb
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.Entities\obj\Debug\Inventario.Entities.csproj.AssemblyReference.cache
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.Entities\obj\Debug\Inventario.Entities.csproj.CoreCompileInputs.cache
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.Entities\obj\Debug\Inventario.Entities.dll
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.Entities\obj\Debug\Inventario.Entities.pdb

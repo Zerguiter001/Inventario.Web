@@ -1,0 +1,11 @@
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.DataAccess\bin\Debug\Inventario.DataAccess.dll
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.DataAccess\bin\Debug\Inventario.DataAccess.pdb
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.DataAccess\bin\Debug\Inventario.Entities.dll
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.DataAccess\bin\Debug\System.Data.SqlClient.dll
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.DataAccess\bin\Debug\Inventario.Entities.pdb
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.DataAccess\bin\Debug\System.Data.SqlClient.xml
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.DataAccess\obj\Debug\Inventario.DataAccess.csproj.AssemblyReference.cache
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.DataAccess\obj\Debug\Inventario.DataAccess.csproj.CoreCompileInputs.cache
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.DataAccess\obj\Debug\Inventar.FA9B718F.Up2Date
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.DataAccess\obj\Debug\Inventario.DataAccess.dll
+C:\Users\Natalie\Documents\Inventario\Inventario.Web\Inventario.DataAccess\obj\Debug\Inventario.DataAccess.pdb
