@@ -120,7 +120,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MovInventarioController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -174,9 +174,7 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\MovInventario\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -208,6 +206,16 @@
     <Content Include="Scripts\bootstrap.bundle.js.map" />
     <Content Include="Scripts\jquery-3.7.0.slim.min.map" />
     <Content Include="Scripts\jquery-3.7.0.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Inventario.BusinessLogic\Inventario.BusinessLogic.csproj">
+      <Project>{8a24499d-cf28-433e-9a74-38af1b65496f}</Project>
+      <Name>Inventario.BusinessLogic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Inventario.Entities\Inventario.Entities.csproj">
+      <Project>{33dd19a5-e7d1-4759-b197-f5ef68030301}</Project>
+      <Name>Inventario.Entities</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
